@@ -1,3 +1,3 @@
-# sistema de acessibilidade visual
+# sistema de acessibilidade auditiva
 
 
