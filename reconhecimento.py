@@ -32,6 +32,7 @@ layout = [
 janela = sg.Window('Assistente visual', layout)
 
 fala_professor = ''
+texto = ''
 
 print("🎙️ Fale algo... (Ctrl+C para sair)\n")
 
