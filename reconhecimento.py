@@ -4,7 +4,7 @@ import json
 import pyperclip
 from vosk import Model, KaldiRecognizer
 
-sg.theme('DarkPurple')
+sg.theme('DarkBlue3')
 
 arquivo_txt="libras.txt" #variavel que define o nome onde a voz captada será transcrita para o arquivo
 
@@ -24,7 +24,7 @@ stream = p.open(format=pyaudio.paInt16, #parâmetros -> define o formato do audi
 
 #LAYOUT
 layout = [
-    [sg.Text('O professor disse:'), sg.Input(key='professor')],
+    [sg.Text('O professor disse:')],
     [sg.Multiline("", size=(60, 10), key='fala', autoscroll=True, disabled=True)],
     [sg.Button('Encerrar')]
 ]
@@ -48,8 +48,9 @@ try:
                 texto = resultado.get("text", "")# pega o texto trasncrito da fala
                 print("🗣️ Você disse:", texto) # a fala aparece no terminal
                 f.write(texto + "\n") #escreve o texto no arquivo
-                fala_professor = texto + fala_professor
+                fala_professor = texto + "\n" + fala_professor
                 janela['fala'].update(fala_professor)
+
 except KeyboardInterrupt: #encerra com CTRL+C
     print("\nEncerrando...")
 
