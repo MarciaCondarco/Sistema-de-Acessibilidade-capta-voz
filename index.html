@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Técnico de Informática</title>
+    <style>
+        body { font-family: Arial; margin: 20px; background-color: #4a28ea; }
+        #status { margin-bottom: 10px; }
+        #texto { border: 1px solid rgb(48, 6, 165); padding: 10px; height: 150px; overflow-y: auto; white-space: pre-wrap; background-color: white;
+        border-radius: 10px;}
+        button { margin-right: 10px; padding: 10px; font-size: 16px; }
+        .btn-start{
+            color: white;
+        }
+    </style>
+    <link rel="shortcut icon" type="image/x-icon" href="../PI/sinais.png">
+</head>
+<body>
+    <h1>PI TI24</h1>
+    <div id="status">Status: <span id="status-text">Aguardando</span></div>
+    <button id="btn-start">Iniciar gravação</button>
+    <button id="btn-stop" disabled>Parar gravação</button>
+    
+    <pre id="texto"></pre>
+
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <script>
+        const btnStart = document.getElementById("btn-start");
+        const btnStop = document.getElementById("btn-stop");
+        const statusText = document.getElementById("status-text");
+        const texto = document.getElementById("texto");
+
+        let ws;
+        let audioContext;
+        let processor;
+        let source;
+
+        function convertFloat32ToInt16(buffer) {
+            let l = buffer.length;
+            const int16Buffer = new Int16Array(l);
+            for (let i = 0; i < l; i++) {
+                let s = Math.max(-1, Math.min(1, buffer[i]));
+                int16Buffer[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+            }
+            return int16Buffer;
+        }
+
+        btnStart.onclick = async () => {
+            ws = new WebSocket("ws://127.0.0.1:8765");
+            ws.binaryType = "arraybuffer";
+
+            ws.onopen = () => {
+                statusText.textContent = "Conectado ao servidor";
+                btnStart.disabled = true;
+                btnStop.disabled = false;
+                texto.textContent = "";
+            };
+
+            ws.onerror = (err) => {
+                statusText.textContent = "Erro no WebSocket";
+                console.error(err);
+            };
+
+            ws.onclose = () => {
+                statusText.textContent = "Conexão fechada";
+                btnStart.disabled = false;
+                btnStop.disabled = true;
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    if (msg.type === "partial") {
+                        statusText.textContent = "Falando... " + msg.text;
+                    } else if (msg.type === "result" || msg.type === "final") {
+                        statusText.textContent = "Transcrição recebida";
+                        texto.textContent += msg.text + "\n";
+                    }
+                } catch(e) {
+                    console.error("Erro mensagem WS:", e);
+                }
+            };
+
+            audioContext = new AudioContext({ sampleRate: 16000 });
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            source = audioContext.createMediaStreamSource(stream);
+            processor = audioContext.createScriptProcessor(4096, 1, 1);
+            source.connect(processor);
+            processor.connect(audioContext.destination);
+
+            processor.onaudioprocess = (e) => {
+                const inputData = e.inputBuffer.getChannelData(0);
+                const int16Data = convertFloat32ToInt16(inputData);
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(int16Data.buffer);
+                }
+            };
+        };
+
+        btnStop.onclick = () => {
+            if (processor) {
+                processor.disconnect();
+                processor.onaudioprocess = null;
+            }
+            if (source) source.disconnect();
+            if (audioContext) audioContext.close();
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ cmd: "eof" }));
+                ws.close();
+            }
+            statusText.textContent = "Gravação parada";
+            btnStart.disabled = false;
+            btnStop.disabled = true;
+        };
+    </script>
+</body>
+</html>
