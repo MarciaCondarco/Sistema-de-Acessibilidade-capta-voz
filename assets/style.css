@@ -1,7 +1,7 @@
 body{ 
     font-family: Arial; 
     margin: 20px; 
-    background-color: #66CDAA; 
+    background-color:#D3D3D3; 
 }
 .btn-start{
     color: white;
@@ -11,14 +11,82 @@ button {
     padding: 10px; 
     font-size: 16px; 
 }
-#texto { 
+#btn-start{
+    background-color: #008000;
+    border-radius: 10px;
+}
+#btn-stop{
+    background-color: red;
+    border-radius: 10px;
+}
+.texto { 
     border: 1px solid black; 
     padding: 10px; height: 150px; 
     overflow-y: auto; 
     white-space: pre-wrap; 
     background-color: white;
     border-radius: 10px;
+    height: 150px;
+    width: 900px;
+}
+.caixa-texto{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 #status { 
     margin-bottom: 10px; 
+}
+.enquadro-icon{
+    background-color: #008000;
+    display: flex;
+    justify-content: end;
+    align-items:center;
+}
+.borda-externa{
+    border: 1px solid gray; 
+    padding: 10px; 
+    height: 550px; 
+    width: 450px;
+    margin-left: 200px;
+    /* overflow-y: auto; 
+    white-space: pre-wrap;  */
+    background-color: white;
+    border-radius: 60px;
+}
+.primeiro-enquadro{
+    display: flex;
+    justify-content: center;
+}
+.primeiro-enquadro img{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0px 0px 0px;
+}
+.primeiro-segundo-enquadro{
+    margin: 0px 500px;
+}
+.segundo-enquadro{
+    background-color: #FFCE1B;
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    margin: 0px;
+    border-radius: 10px;
+}
+
+.primeiro-terceiro-enquadro{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.terceiro-enquadro-microfone{
+    margin-top: 20px;
+}
+.btn-iniciar-parar{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
 }

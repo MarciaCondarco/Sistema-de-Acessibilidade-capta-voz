@@ -7,13 +7,34 @@
     <link rel="shortcut icon" type="image/x-icon" href="../PI/sinais.png">
 </head>
 <body>
-    <h1>Sistema capta a voz</h1>
-    <div id="status">Status: <span id="status-text">Aguardando</span></div>
-    <button id="btn-start">Iniciar gravação</button>
-    <button id="btn-stop" disabled>Parar gravação</button>
-    
-    <pre id="texto"></pre>
-
+    <!-- <div class="borda-externa"> -->
+        <div class="primeiro-enquadro">
+            <img src="./iconeplaneta.png" alt="" height="50px" >
+            <h1>Sistema de Captura de voz</h1>
+        </div>
+        <div class="primeiro-segundo-enquadro">
+            <div class="segundo-enquadro">
+                <p>Status: <span id="status-text">Aguardando</span> </p>
+                <!-- status identifica o estado atual do navegador se esta conectado ou não -->
+            </div>
+        </div>
+        <div class="primeiro-terceiro-enquadro">
+            <div class="terceiro-enquadro-microfone">
+                <img src="./microfone.png" alt="" height="90px">
+            </div>
+        </div>
+        <div class="btn-enquadro-iniciar-parar">
+            <div class="btn-iniciar-parar">
+                <button id="btn-start">Iniciar gravação</button> 
+                <!-- botão de iniciar gravação - > identificado com btn-start -->
+                <button id="btn-stop" disabled>Parar gravação</button>
+            </div>
+        </div>
+        <div class="caixa-texto-enquadro">
+            <div class="caixa-texto">
+                <pre class="texto"></pre>
+            </div>
+        </div>
     <div vw class="enabled">
         <div vw-access-button class="active"></div>
         <div vw-plugin-wrapper>
