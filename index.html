@@ -2,15 +2,18 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Belanosima:wght@400;600;700&family=Chakra+Petch:wght@300&family=Delius&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./assets/style.css">
-    <title>Técnico de Informática</title>
+    <title>V.E.M</title>
     <link rel="shortcut icon" type="image/x-icon" href="../PI/sinais.png">
 </head>
 <body>
     <!-- <div class="borda-externa"> -->
         <div class="primeiro-enquadro">
             <img src="./iconeplaneta.png" alt="" height="50px" >
-            <h1>Sistema de Captura de voz</h1>
+            <h1>VozEmMãos</h1>
         </div>
         <div class="primeiro-segundo-enquadro">
             <div class="segundo-enquadro">
@@ -20,7 +23,7 @@
         </div>
         <div class="primeiro-terceiro-enquadro">
             <div class="terceiro-enquadro-microfone">
-                <img src="./microfone.png" alt="" height="90px">
+                <img src="./microfone.png" alt="" height="90px" class="microfone">
             </div>
         </div>
         <div class="btn-enquadro-iniciar-parar">
@@ -32,108 +35,19 @@
         </div>
         <div class="caixa-texto-enquadro">
             <div class="caixa-texto">
-                <pre class="texto"></pre>
+                <pre id="texto"></pre>
             </div>
         </div>
-    <div vw class="enabled">
+        <div vw class="enabled">
         <div vw-access-button class="active"></div>
         <div vw-plugin-wrapper>
-            <div class="vw-plugin-top-wrapper"></div>
+            <div class="vw-plugin-top-wrapper"><a href=""></a></div>
         </div>
     </div>
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
-
-    <script>
-        const btnStart = document.getElementById("btn-start");
-        const btnStop = document.getElementById("btn-stop");
-        const statusText = document.getElementById("status-text");
-        const texto = document.getElementById("texto");
-
-        let ws;
-        let audioContext;
-        let processor;
-        let source;
-
-        function convertFloat32ToInt16(buffer) {
-            let l = buffer.length;
-            const int16Buffer = new Int16Array(l);
-            for (let i = 0; i < l; i++) {
-                let s = Math.max(-1, Math.min(1, buffer[i]));
-                int16Buffer[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-            }
-            return int16Buffer;
-        }
-
-        btnStart.onclick = async () => {
-            ws = new WebSocket("ws://127.0.0.1:8765");
-            ws.binaryType = "arraybuffer";
-
-            ws.onopen = () => {
-                statusText.textContent = "Conectado ao servidor";
-                btnStart.disabled = true;
-                btnStop.disabled = false;
-                texto.textContent = "";
-            };
-
-            ws.onerror = (err) => {
-                statusText.textContent = "Erro no WebSocket";
-                console.error(err);
-            };
-
-            ws.onclose = () => {
-                statusText.textContent = "Conexão fechada";
-                btnStart.disabled = false;
-                btnStop.disabled = true;
-            };
-
-            ws.onmessage = (event) => {
-                try {
-                    const msg = JSON.parse(event.data);
-                    if (msg.type === "partial") {
-                        statusText.textContent = "Falando... " + msg.text;
-                    } else if (msg.type === "result" || msg.type === "final") {
-                        statusText.textContent = "Transcrição recebida";
-                        texto.textContent += msg.text + "\n";
-                    }
-                } catch(e) {
-                    console.error("Erro mensagem WS:", e);
-                }
-            };
-
-            audioContext = new AudioContext({ sampleRate: 16000 });
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            source = audioContext.createMediaStreamSource(stream);
-            processor = audioContext.createScriptProcessor(4096, 1, 1);
-            source.connect(processor);
-            processor.connect(audioContext.destination);
-
-            processor.onaudioprocess = (e) => {
-                const inputData = e.inputBuffer.getChannelData(0);
-                const int16Data = convertFloat32ToInt16(inputData);
-                if (ws.readyState === WebSocket.OPEN) {
-                    ws.send(int16Data.buffer);
-                }
-            };
-        };
-
-        btnStop.onclick = () => {
-            if (processor) {
-                processor.disconnect();
-                processor.onaudioprocess = null;
-            }
-            if (source) source.disconnect();
-            if (audioContext) audioContext.close();
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ cmd: "eof" }));
-                ws.close();
-            }
-            statusText.textContent = "Gravação parada";
-            btnStart.disabled = false;
-            btnStop.disabled = true;
-        };
-    </script>
+    <script src="ativacao_sistema.js"></script>
 </body>
 </html>
